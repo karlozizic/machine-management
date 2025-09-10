@@ -1,0 +1,7 @@
+﻿services:
+  machinemanagement.api:
+    image: machinemanagement.api
+    build:
+      context: .
+      dockerfile: MachineManagement.API/Dockerfile
+
