@@ -207,6 +207,26 @@ public class MalfunctionRepository : IMalfunctionRepository
         var malfunctions = await _dbConnection.QueryAsync<Malfunction>(query, new { MachineId = machineId });
         return malfunctions;
     }
+    
+    public async Task<bool> ExistsByIdAsync(int id)
+    {
+        const string query = "SELECT EXISTS(SELECT 1 FROM malfunctions WHERE id = @Id)";
+        return await _dbConnection.ExecuteScalarAsync<bool>(query, new { Id = id });
+    }
+
+    public async Task<bool> HasActiveMalfunctionsAsync(int machineId)
+    {
+        const string query = @"
+            SELECT EXISTS(
+                SELECT 1
+                FROM malfunctions
+                WHERE machine_id = @MachineId 
+                  AND is_resolved = FALSE 
+                  AND end_time IS NULL
+                )";
+        
+        return await _dbConnection.ExecuteScalarAsync<bool>(query, new { MachineId = machineId });
+    }
 }
 
 public interface IMalfunctionRepository
@@ -219,4 +239,6 @@ public interface IMalfunctionRepository
     Task<bool> DeleteAsync(int id);
     Task<bool> Resolve(int id, DateTime? endTime = null);
     Task<IEnumerable<Malfunction>> GetByMachineIdAsync(int machineId);
+    Task<bool> ExistsByIdAsync(int id);
+    Task<bool> HasActiveMalfunctionsAsync(int machineId);
 }

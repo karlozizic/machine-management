@@ -5,8 +5,6 @@ namespace MachineManagement.API.Models;
 
 public class CreateMalfunctionDto
 {
-    [Required(ErrorMessage = "Name is required.")]
-    [StringLength(255, ErrorMessage = "Name cannot exceed 255 characters.")]
     public string Name { get; set; } = string.Empty;
     [Required(ErrorMessage = "MachineId is required.")]
     [Range(1, int.MaxValue, ErrorMessage = "MachineId must be a positive integer.")]

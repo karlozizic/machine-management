@@ -1,5 +1,6 @@
 using MachineManagement.API.Entities;
 using MachineManagement.API.Models;
+using MachineManagement.API.Result;
 using MachineManagement.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public class MalfunctionController :  ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<Malfunction>>> GetAll()
     {
         var malfunctions = await _malfunctionService.GetAllAsync();
         return Ok(malfunctions);
@@ -34,59 +35,45 @@ public class MalfunctionController :  ControllerBase
     }
     
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<ActionResult<Malfunction>> GetById(int id)
     {
-        var malfunction = await _malfunctionService.GetByIdAsync(id);
-        if (malfunction == null)
-            return NotFound();
-        
-        return Ok(malfunction);
+        var malfunctionResult = await _malfunctionService.GetByIdAsync(id);
+        return malfunctionResult.ToActionResult();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateMalfunctionDto dto)
+    public async Task<ActionResult<Malfunction>> Create([FromBody] CreateMalfunctionDto dto)
     {
-        var malfunction = await _malfunctionService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = malfunction.Id }, malfunction);
+        var malfunctionResult = await _malfunctionService.CreateAsync(dto);
+        return malfunctionResult.ToActionResult();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateMalfunctionDto dto)
+    public async Task<ActionResult<Malfunction>> Update(int id, [FromBody] UpdateMalfunctionDto dto)
     {
-        var malfunction = await _malfunctionService.UpdateAsync(id, dto);
-        if (malfunction == null)
-            return NotFound();
-
-        return Ok(malfunction);
+        var malfunctionResult = await _malfunctionService.UpdateAsync(id, dto);
+        
+        return Ok(malfunctionResult);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<ActionResult<bool>> Delete(int id)
     {
         var success = await _malfunctionService.DeleteAsync(id);
-
-        if (!success)
-            return NotFound();
-
-        return NoContent();
+        return success.ToActionResult();
     }
 
     [HttpPost("{id}/resolve")]
-    public async Task<IActionResult> Resolve(int id, [FromQuery] DateTime? end)
+    public async Task<ActionResult<bool>> Resolve(int id, [FromQuery] DateTime? end)
     {
         var success = await _malfunctionService.Resolve(id, end);
-
-        if (!success)
-            return NotFound();
-
-        return NoContent();
+        return success.ToActionResult();
     }
 
     [HttpGet("machine/{machineId}")]
-    public async Task<IActionResult> GetByMachineId(int machineId)
+    public async Task<ActionResult<IEnumerable<Malfunction>>> GetByMachineId(int machineId)
     {
         var malfunctions = await _malfunctionService.GetByMachineIdAsync(machineId);
-
-        return Ok(malfunctions);
+        return malfunctions.ToActionResult();
     }
 }

@@ -20,7 +20,7 @@ public class MachineService : IMachineService
         return Result<IEnumerable<Machine>>.Success(machines);
     }
 
-    public async Task<Result<Machine?>> GetMachineByIdAsync(int id)
+    public async Task<Result<Machine>> GetMachineByIdAsync(int id)
     {
         if (id <= 0)
             return Error.BadRequest("Invalid machine ID.");
@@ -44,7 +44,7 @@ public class MachineService : IMachineService
         return await _machineRepository.CreateAsync(dto);
     }
 
-    public async Task<Result<Machine?>> UpdateMachineAsync(int id, UpdateMachineDto dto)
+    public async Task<Result<Machine>> UpdateMachineAsync(int id, UpdateMachineDto dto)
     {
         if (id <= 0)
             return Error.BadRequest("Invalid machine ID.");
@@ -55,7 +55,7 @@ public class MachineService : IMachineService
         if (await _machineRepository.ExistsAsync(dto.Name))
             return Error.BadRequest("Another machine with the same name already exists.");
         
-        if (await _machineRepository.GetByIdAsync(id) == null)
+        if (!await _machineRepository.ExistsByIdAsync(id))
             return Error.NotFound("Machine not found.");
         
         var updatedMachine = await _machineRepository.UpdateAsync(id, dto);
@@ -71,7 +71,7 @@ public class MachineService : IMachineService
         if (id <= 0)
             return Error.BadRequest("Invalid machine ID.");
         
-        if (await _machineRepository.GetByIdAsync(id) == null)
+        if (!await _machineRepository.ExistsByIdAsync(id))
             return Error.NotFound("Machine not found.");
         
         var deleted = await _machineRepository.DeleteAsync(id);
@@ -86,8 +86,8 @@ public class MachineService : IMachineService
 public interface IMachineService
 {
     Task<Result<IEnumerable<Machine>>> GetAllMachinesAsync();
-    Task<Result<Machine?>> GetMachineByIdAsync(int id);
+    Task<Result<Machine>> GetMachineByIdAsync(int id);
     Task<Result<Machine>> CreateMachineAsync(CreateMachineDto dto);
-    Task<Result<Machine?>> UpdateMachineAsync(int id, UpdateMachineDto dto);
+    Task<Result<Machine>> UpdateMachineAsync(int id, UpdateMachineDto dto);
     Task<Result<bool>> DeleteMachineAsync(int id);
 }

@@ -5,7 +5,7 @@ services:
     image: postgres:15
     container_name: machine-management-db
     environment:
-      POSTGRES_DB: machine_management
+      POSTGRES_DB: machine_mgmt
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin123
     ports:
@@ -25,7 +25,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
-      - ConnectionStrings__DefaultConnection=Host=postgresql;Database=machine_management;Username=admin;Password=admin123
+      - ConnectionStrings__DefaultConnection=Host=postgresql;Database=machine_mgmt;Username=admin;Password=admin123
     depends_on:
       - postgresql
     networks:

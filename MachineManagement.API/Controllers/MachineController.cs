@@ -26,7 +26,7 @@ public class MachineController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Machine?>> GetMachineById(int id)
+    public async Task<ActionResult<Machine>> GetMachineById(int id)
     {
         var machineResult = await _machineService.GetMachineByIdAsync(id);
         return machineResult.ToActionResult();    
@@ -41,7 +41,7 @@ public class MachineController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<Machine?>> UpdateMachine(int id, [FromBody] UpdateMachineDto dto)
+    public async Task<ActionResult<Machine>> UpdateMachine(int id, [FromBody] UpdateMachineDto dto)
     {
         var machineResult = await _machineService.UpdateMachineAsync(id, dto);
         return machineResult.ToActionResult();
