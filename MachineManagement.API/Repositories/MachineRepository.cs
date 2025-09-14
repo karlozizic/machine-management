@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using MachineManagement.API.Entities;
 using MachineManagement.API.Models;
 
 namespace MachineManagement.API.Repositories;

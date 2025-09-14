@@ -1,3 +1,5 @@
+using MachineManagement.API.Entities;
+
 namespace MachineManagement.API.Models;
 
 public class UpdateMalfunctionDto

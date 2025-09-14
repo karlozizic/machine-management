@@ -1,3 +1,4 @@
+using MachineManagement.API.Entities;
 using MachineManagement.API.Models;
 using MachineManagement.API.Repositories;
 

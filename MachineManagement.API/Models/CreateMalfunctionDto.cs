@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MachineManagement.API.Entities;
 
 namespace MachineManagement.API.Models;
 
