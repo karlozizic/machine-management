@@ -1,4 +1,6 @@
+using MachineManagement.API.Entities;
 using MachineManagement.API.Models;
+using MachineManagement.API.Result;
 using MachineManagement.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,51 +18,39 @@ public class MachineController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetMachines()
+    public async Task<ActionResult<IEnumerable<Machine>>> GetMachines()
     {
-        var machines = await _machineService.GetAllMachinesAsync();
+        var machinesResult = await _machineService.GetAllMachinesAsync();
 
-        return Ok(machines);
+        return machinesResult.ToActionResult();
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetMachineById(int id)
+    public async Task<ActionResult<Machine?>> GetMachineById(int id)
     {
-        var machine = await _machineService.GetMachineByIdAsync(id);
-
-        if (machine == null)
-            return NotFound();
-
-        return Ok(machine);
+        var machineResult = await _machineService.GetMachineByIdAsync(id);
+        return machineResult.ToActionResult();    
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateMachine([FromBody] CreateMachineDto dto)
+    public async Task<ActionResult<Machine>> CreateMachine([FromBody] CreateMachineDto dto)
     {
-        var machine = await _machineService.CreateMachineAsync(dto);
-
-        return CreatedAtAction(nameof(GetMachineById), new { id = machine.Id }, machine);
+        var machineResult = await _machineService.CreateMachineAsync(dto);
+        
+        return machineResult.ToActionResult();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateMachine(int id, [FromBody] UpdateMachineDto dto)
+    public async Task<ActionResult<Machine?>> UpdateMachine(int id, [FromBody] UpdateMachineDto dto)
     {
-        var machine = await _machineService.UpdateMachineAsync(id, dto);
-
-        if (machine == null)
-            return NotFound();
-
-        return Ok(machine);
+        var machineResult = await _machineService.UpdateMachineAsync(id, dto);
+        return machineResult.ToActionResult();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteMachine(int id)
+    public async Task<ActionResult<bool>> DeleteMachine(int id)
     {
-        var success = await _machineService.DeleteMachineAsync(id);
-
-        if (!success)
-            return NotFound();
-
-        return NoContent();
+        var result = await _machineService.DeleteMachineAsync(id);
+        return result.ToActionResult();
     }
 }

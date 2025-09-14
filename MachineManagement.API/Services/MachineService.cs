@@ -1,6 +1,7 @@
 using MachineManagement.API.Entities;
 using MachineManagement.API.Models;
 using MachineManagement.API.Repositories;
+using MachineManagement.API.Result;
 
 namespace MachineManagement.API.Services;
 
@@ -13,37 +14,80 @@ public class MachineService : IMachineService
         _machineRepository = machineRepository;
     }
     
-    public async Task<IEnumerable<Machine>> GetAllMachinesAsync()
+    public async Task<Result<IEnumerable<Machine>>> GetAllMachinesAsync()
     {
-        return await _machineRepository.GetAllAsync();
+        var machines =  await _machineRepository.GetAllAsync();
+        return Result<IEnumerable<Machine>>.Success(machines);
     }
 
-    public async Task<Machine?> GetMachineByIdAsync(int id)
+    public async Task<Result<Machine?>> GetMachineByIdAsync(int id)
     {
-        return await _machineRepository.GetByIdAsync(id);
+        if (id <= 0)
+            return Error.BadRequest("Invalid machine ID.");
+        
+        var machine = await _machineRepository.GetByIdAsync(id);
+        
+        if (machine == null)
+            return Error.NotFound("Machine not found.");
+
+        return machine;
     }
 
-    public async Task<Machine> CreateMachineAsync(CreateMachineDto dto)
+    public async Task<Result<Machine>> CreateMachineAsync(CreateMachineDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return Error.BadRequest("Machine name is required.");
+        
+        if (await _machineRepository.ExistsAsync(dto.Name))
+            return Error.BadRequest("Machine with the same name already exists.");
+        
         return await _machineRepository.CreateAsync(dto);
     }
 
-    public async Task<Machine?> UpdateMachineAsync(int id, UpdateMachineDto dto)
+    public async Task<Result<Machine?>> UpdateMachineAsync(int id, UpdateMachineDto dto)
     {
-        return await _machineRepository.UpdateAsync(id, dto);
+        if (id <= 0)
+            return Error.BadRequest("Invalid machine ID.");
+         
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return Error.BadRequest("Machine name is required.");
+        
+        if (await _machineRepository.ExistsAsync(dto.Name))
+            return Error.BadRequest("Another machine with the same name already exists.");
+        
+        if (await _machineRepository.GetByIdAsync(id) == null)
+            return Error.NotFound("Machine not found.");
+        
+        var updatedMachine = await _machineRepository.UpdateAsync(id, dto);
+        
+        if (updatedMachine == null)
+            return Error.InternalServerError("Failed to update machine.");
+        
+        return updatedMachine;
     }
 
-    public async Task<bool> DeleteMachineAsync(int id)
+    public async Task<Result<bool>> DeleteMachineAsync(int id)
     {
-        return await _machineRepository.DeleteAsync(id);
+        if (id <= 0)
+            return Error.BadRequest("Invalid machine ID.");
+        
+        if (await _machineRepository.GetByIdAsync(id) == null)
+            return Error.NotFound("Machine not found.");
+        
+        var deleted = await _machineRepository.DeleteAsync(id);
+        
+        if (!deleted)
+            return Error.InternalServerError("Failed to delete machine.");
+
+        return true;
     }
 }
 
 public interface IMachineService
 {
-    Task<IEnumerable<Machine>> GetAllMachinesAsync();
-    Task<Machine?> GetMachineByIdAsync(int id);
-    Task<Machine> CreateMachineAsync(CreateMachineDto dto);
-    Task<Machine?> UpdateMachineAsync(int id, UpdateMachineDto dto);
-    Task<bool> DeleteMachineAsync(int id);
+    Task<Result<IEnumerable<Machine>>> GetAllMachinesAsync();
+    Task<Result<Machine?>> GetMachineByIdAsync(int id);
+    Task<Result<Machine>> CreateMachineAsync(CreateMachineDto dto);
+    Task<Result<Machine?>> UpdateMachineAsync(int id, UpdateMachineDto dto);
+    Task<Result<bool>> DeleteMachineAsync(int id);
 }

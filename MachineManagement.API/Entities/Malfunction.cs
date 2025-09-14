@@ -1,4 +1,3 @@
-using MachineManagement.API.Models;
 
 namespace MachineManagement.API.Entities;
 
