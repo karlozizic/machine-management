@@ -23,7 +23,6 @@ public class MalfunctionService : IMalfunctionService
         return Result<IEnumerable<Malfunction>>.Success(malfunctions);
     }
     
-    //TODO: add filtering, sorting
     public async Task<Result<PagedResult<Malfunction>>> GetPagedAsync(int page, int pageSize)
     {
         return await _malfunctionRepository.GetPagedAsync(page, pageSize);
