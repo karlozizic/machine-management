@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using MachineManagement.API.Entities;
 using MachineManagement.API.Models;
 
 namespace MachineManagement.API.Repositories;
@@ -66,6 +67,19 @@ public class MachineRepository : IMachineRepository
         
         return machine;
     }
+    
+    public async Task<bool> ExistsAsync(string name)
+    {
+        const string query = "SELECT COUNT(1) FROM machines WHERE LOWER(name) = LOWER(@Name)";
+        var count = await _dbConnection.ExecuteScalarAsync<int>(query, new { Name = name });
+        return count > 0;
+    }
+    
+    public async Task<bool> ExistsByIdAsync(int id)
+    {
+        const string query = "SELECT EXISTS(SELECT 1 FROM machines WHERE id = @Id)";
+        return await _dbConnection.ExecuteScalarAsync<bool>(query, new { Id = id });
+    }
 
     public async Task<Machine> CreateAsync(CreateMachineDto dto)
     {
@@ -120,4 +134,6 @@ public interface IMachineRepository
     Task<Machine> CreateAsync(CreateMachineDto dto);
     Task<Machine?> UpdateAsync(int id, UpdateMachineDto dto);
     Task<bool> DeleteAsync(int id);
+    Task<bool> ExistsAsync(string name);
+    Task<bool> ExistsByIdAsync(int id);
 }

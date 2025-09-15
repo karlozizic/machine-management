@@ -1,4 +1,4 @@
-namespace MachineManagement.API.Models;
+namespace MachineManagement.API.Entities;
 
 public enum Priority
 {

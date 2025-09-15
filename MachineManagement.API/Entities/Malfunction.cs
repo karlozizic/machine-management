@@ -1,4 +1,5 @@
-namespace MachineManagement.API.Models;
+
+namespace MachineManagement.API.Entities;
 
 public class Malfunction
 {
